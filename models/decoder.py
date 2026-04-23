@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 
 class DecoderRNN(nn.Module):
@@ -9,6 +10,15 @@ class DecoderRNN(nn.Module):
 
     def forward(self, features, captions):
         embeddings = self.embedding(captions)
-        outputs, _ = self.lstm(embeddings)
+
+        features = features.unsqueeze(0)
+        
+        embeddings = embeddings.permute(1, 0, 2)
+
+        inputs = torch.cat((features, embeddings), dim=0)
+
+        outputs, _ = self.lstm(inputs)
+        
         outputs = self.fc(outputs)
-        return outputs
+
+        return outputs.permute(1, 0, 2)

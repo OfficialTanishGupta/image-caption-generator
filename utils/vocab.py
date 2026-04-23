@@ -1,7 +1,10 @@
 import nltk
 from collections import Counter
 
-nltk.download('punkt')
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt')
 
 class Vocabulary:
     def __init__(self, freq_threshold=5):

@@ -1,10 +1,11 @@
 import torch.nn as nn
 import torchvision.models as models
+from torchvision.models import resnet50, ResNet50_Weights
 
 class EncoderCNN(nn.Module):
     def __init__(self, embed_size):
         super().__init__()
-        resnet = models.resnet50(pretrained=True)
+        resnet = resnet50(weights=ResNet50_Weights.DEFAULT)
         for param in resnet.parameters():
             param.requires_grad = False
 
