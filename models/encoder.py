@@ -1,20 +1,28 @@
+import torch
 import torch.nn as nn
 import torchvision.models as models
-from torchvision.models import resnet50, ResNet50_Weights
 
 class EncoderCNN(nn.Module):
-    def __init__(self, embed_size):
+    def __init__(self):
         super().__init__()
-        resnet = resnet50(weights=ResNet50_Weights.DEFAULT)
-        for param in resnet.parameters():
+
+        resnet = models.resnet50(pretrained=True)
+
+        # remove avgpool + fc
+        modules = list(resnet.children())[:-2]
+        self.resnet = nn.Sequential(*modules)
+
+        for param in self.resnet.parameters():
             param.requires_grad = False
 
-        modules = list(resnet.children())[:-1]
-        self.resnet = nn.Sequential(*modules)
-        self.fc = nn.Linear(resnet.fc.in_features, embed_size)
-
     def forward(self, images):
-        features = self.resnet(images)
-        features = features.reshape(features.size(0), -1)
-        features = self.fc(features)
+        features = self.resnet(images)  
+        # shape: (batch, 2048, 7, 7)
+
+        batch_size, channels, height, width = features.size()
+
+        # reshape to (batch, num_pixels, feature_dim)
+        features = features.view(batch_size, channels, -1)
+        features = features.permute(0, 2, 1)
+
         return features

@@ -78,7 +78,7 @@ def train():
 
             # Loss calculation
             loss = criterion(
-                outputs[:, 1:, :].reshape(-1, vocab_size), 
+                outputs.reshape(-1, vocab_size), 
                 caps[:, 1:].reshape(-1)
             )
 
