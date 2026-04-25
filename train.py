@@ -55,13 +55,33 @@ def train():
     # ======================
     embed_size = 256
     hidden_size = 256
-    learning_rate = 1e-3
-    num_epochs = 10
+    learning_rate = 3e-4
+    num_epochs = 20
     model = ImageCaptionModel(embed_size, hidden_size, vocab_size).to(device)
     model.train()
 
     criterion = nn.CrossEntropyLoss(ignore_index=pad_idx)
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    
+    
+    
+    encoder_params = []
+    decoder_params = []
+
+    for name, param in model.named_parameters():
+        if "encoder" in name and param.requires_grad:
+            encoder_params.append(param)
+        else:
+            decoder_params.append(param)
+
+    optimizer = torch.optim.Adam([
+        {"params": encoder_params, "lr": 1e-5},
+        {"params": decoder_params, "lr": 3e-4}
+    ])
+    
+    
+    
+        
 
     # ======================
     # 4. Training Loop
@@ -93,6 +113,10 @@ def train():
         torch.save(model.state_dict(), f"model_epoch_{epoch+1}.pth")
 
     print("Training Complete!")
+    
+    
+    
+    
 
 # This block is required on Windows to use num_workers > 0
 if __name__ == "__main__":

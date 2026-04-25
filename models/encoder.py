@@ -12,8 +12,11 @@ class EncoderCNN(nn.Module):
         modules = list(resnet.children())[:-2]
         self.resnet = nn.Sequential(*modules)
 
-        for param in self.resnet.parameters():
-            param.requires_grad = False
+        for name, param in self.resnet.named_parameters():
+             if "layer4" in name:
+                param.requires_grad = True   # fine-tune last block
+             else:
+                param.requires_grad = False
 
     def forward(self, images):
         features = self.resnet(images)  
