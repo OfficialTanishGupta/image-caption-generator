@@ -14,7 +14,7 @@ class CocoDataset(Dataset):
         with open(annotation_file, 'r') as f:
             data = json.load(f)
 
-        self.annotations = data['annotations']
+        self.annotations = data['annotations'][:5000]
         self.images = {img['id']: img['file_name'] for img in data['images']}
 
     def __len__(self):
